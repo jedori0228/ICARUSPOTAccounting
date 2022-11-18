@@ -12,7 +12,7 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ## Creating environment from a .yml file (only need once)
 conda env create --name runco --file=CondaEnv/runco.yml
 ## Activating the environment (every time with new shell)
-conda acticate runco
+conda activate runco
 ```
 
 ## Setup
