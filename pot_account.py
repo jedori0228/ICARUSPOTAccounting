@@ -15,7 +15,7 @@ import sqlite3
 
 from beaminfo.simple_query import query_full_day, query_pot_interval
 from utils.dbmanager import add_day_pot_beam, create_connection, create_table, remove_run_day_pot, remove_day_pot_beam, remove_daily_collected_pot
-from runinfo.read_run_info import insert_daily_runs, make_timestamp, get_day_range, insert_runs
+from runinfo.read_run_info import insert_daily_runs, make_timestamp, get_day_range
 
 from plotting.plots_utils import makePOTPlot, makePOTSumPlot, makeDAQEffPlot, makePOTPlotBoth
 from plotting.plots_utils import makePOTPlotRun, makePOTSumPlotRun, makeDAQEffPlotRun, makePOTPlotBothRun
@@ -40,53 +40,11 @@ def cli(ctx):
 #######################################################################################################
 
 @cli.command("update-daily-pot")
-@click.argument("day")
-@click.argument("override")
-@click.pass_context
-def update_daily_pot( ctx, day, override=False ):
-    """
-    Update the delivered POT for both beam: 
-    Args: 
-        day: string with the day with the values to update in the format "yyyy-mm-dd"
-        override: delete if a row for that day already exists 
-    Returs: 
-        None
-    """
-
-    print("@@ Connecting to %s/dbase/%s"%(potDir, masterDBName))
-    conn = create_connection("%s/dbase/%s"%(potDir, masterDBName))
-
-    if conn is not None:
-
-        print( "Updating the POT delivered on: {}".format(day) )
-
-        if override:
-
-            print( "Remove existing rows with key on: {}".format(day) )
-
-            remove_day_pot_beam(conn, day, "bnb")
-            remove_day_pot_beam(conn, day, "numi")
-        
-        ts_start_day = make_timestamp( day+" 00:00:00 CDT", "%Y-%m-%d %H:%M:%S %Z" )
-        ts_end_day   = make_timestamp( day+" 23:59:59 CDT", "%Y-%m-%d %H:%M:%S %Z" )
-        add_day_pot_beam( conn, ( day, query_full_day(ts_start_day,ts_end_day, "E:TORTGT", "a9") ), "numi" )
-        add_day_pot_beam( conn, ( day, query_full_day(ts_start_day,ts_end_day, "E:TOR875", "1d") ), "bnb")
-        
-        print(" ALL pot delivered information updated for day {} ".format(day))
-       
-    else:
-
-        print("FAILED CONNECTION")
-
-
-#################################################################################
-
-@cli.command("update-multi-daily-pot")
 @click.argument("start_day")
 @click.argument("end_day")
 @click.argument("override")
 @click.pass_context
-def update_multi_daily_pot( ctx, start_day="", end_day="", override=False ):
+def update_daily_pot( ctx, start_day="", end_day="", override=False ):
     """
     Update the delivered POT for both beam: 
     Args: 
@@ -127,60 +85,11 @@ def update_multi_daily_pot( ctx, start_day="", end_day="", override=False ):
 #######################################################################################################
 
 @cli.command("update-daily-runs")
-@click.argument("day")
-@click.argument("override")
-@click.pass_context
-def update_daily_runs( ctx, day, override=False ):
-    """
-    Update the collected POT associated to a run for both beam: 
-    Args: 
-        day: string with the day with the values to update in the format "yyyy-mm-dd"
-        override: delete if a row for that day already exists 
-    Returs: 
-        None
-    """
-
-    conn = create_connection("%s/dbase/%s"%(potDir,masterDBName))
-
-    if conn is not None:
-
-        print( "Updating the POT collected on: {}".format(day) )
-
-        if override:
-
-            print( "Remove existing rows with key on: {}".format(day) )
-
-            remove_run_day_pot( conn, day )
-        
-        try:
-            #insert_daily_majority_runs(conn, day)
-            print("Inserting daily runs")
-#            insert_runs( conn )
-            insert_daily_runs( conn, day )
-        except:
-            print("RUN DATA NOT INSERTED: This might be because no files with this characterisitcs are found for day {}".format(day) )
-        
-        """
-        try:
-            insert_daily_minbias_runs(conn, day)
-        except:
-            print("MinBias Run DATA NOT INSERTED: This might be because no files with this characterisitcs are found for day {}".format(day) )
-        """
-
-        print(" ALL pot collected information updated for day {} ".format(day))
-        
-    else:
-
-        print("FAILED CONNECTION")
-
-#######################################################################################################
-
-@cli.command("update-multi-daily-runs")
 @click.argument("start_day")
 @click.argument("end_day")
 @click.argument("override")
 @click.pass_context
-def update_multi_daily_runs( ctx, start_day="", end_day="", override=False ):
+def update_daily_runs( ctx, start_day="", end_day="", override=False ):
     """
     Update the collected POT associated to a run for both beam: 
     Args: 
@@ -208,54 +117,6 @@ def update_multi_daily_runs( ctx, start_day="", end_day="", override=False ):
     else:
 
         print("FAILED CONNECTION")
-
-#######################################################################################################
-
-def load_all_runs( ctx, override=False ):
-    """
-    Update the collected POT associated to a run for both beam: 
-    Args: 
-        day: string with the day with the values to update in the format "yyyy-mm-dd"
-        override: delete if a row for that day already exists 
-    Returs: 
-        None
-    """
-
-    conn = create_connection("%s/dbase/%s"%(potDir,masterDBName))
-
-    if conn is not None:
-        
-        try:
-            #insert_daily_majority_runs(conn, day)
-            print("inserting runs")
-            insert_runs( conn )
-        except:
-            print("RUN DATA NOT INSERTED: This might be because no files with this characterisitcs are found  ")
-        
-        """
-        try:
-            insert_daily_minbias_runs(conn, day)
-        except:
-            print("MinBias Run DATA NOT INSERTED: This might be because no files with this characterisitcs are found for day {}".format(day) )
-        """
-
-        print(" ALL pot collected information updated " )
-        
-    else:
-
-        print("FAILED CONNECTION")
-
-#######################################################################################################
-
-@cli.command("make-beam-plots")
-@click.pass_context
-def make_beam_plots( ctx ):
-    """
-    Make the beam quality plots witin the timestamps selected 
-    NB: Be careful and do no query over 3 days of beam data
-    """
-
-    return
 
 #######################################################################################################
 
@@ -323,13 +184,13 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
     plt.savefig("fig/eff_pot_numi.pdf")
 
     plt = makePOTSumPlot( pot_run_collected, "bnb", time_range)
-    plt.savefig("fig/cumsum_pot_bnb.pdf")
+    plt.savefig("fig/cumulative_pot_bnb.pdf")
 
     plt = makePOTSumPlot( pot_run_collected, "numi", time_range)
-    plt.savefig("fig/cumsum_pot_numi.pdf")
+    plt.savefig("fig/cumulative_pot_numi.pdf")
 
     plt = makePOTPlotBoth( pot_run_collected, "numi", "bnb", time_range)
-    plt.savefig("fig/cumsum_pot_numi_bnb.pdf")
+    plt.savefig("fig/cumulative_pot_numi_bnb.pdf")
 
 
     plt = makeDAQEffPlot( pot_run_collected, time_range )
@@ -337,6 +198,7 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
     plt.show()
     
     return
+
 #######################################################################################################
 
 @cli.command("make-runbyrun-plots")
@@ -413,47 +275,6 @@ def make_runbyrun_plots( ctx, run=""):
 #    plt.show()
     
     return
-
-#######################################################################################################
-
-@cli.command("update-runs")
-@click.argument("first")
-@click.argument("last")
-@click.argument("override")
-@click.pass_context
-def update_runs( ctx, first, last, override=False ):
-    """
-    Update the collected POT associated to a run for both beam: 
-    Args: 
-        day: string with the day with the values to update in the format "yyyy-mm-dd"
-        override: delete if a row for that day already exists 
-    Returs: 
-        None
-    """
-
-    conn = create_connection("%s/dbase/run02_beaminfo.db"%(potDir))
-
-    if conn is not None:
-
-        print( "Updating the POT collected on runs: {}")
-
-        if override:
-
-            print( "Remove existing rows with key on: {}" )
-        
-        try:
-            #insert_daily_majority_runs(conn, day)
-
-            insert_runs( conn )
-        except:
-            print("RUN DATA NOT INSERTED: This might be because no files with this characterisitcs are found for day {}")
-
-
-        print(" ALL pot collected information updated for day {} ")
-        
-    else:
-
-        print("FAILED CONNECTION")
 
 def main():
     cli(obj=dict())

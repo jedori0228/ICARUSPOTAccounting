@@ -3,10 +3,18 @@ import time
 import datetime
 import numpy as np
 import sqlite3
+import argparse
 
 from utils.dbmanager import add_run_day_pot, add_run_pot, create_connection, create_table
 from beaminfo.simple_query import query_pot_interval
 from runinfo.read_run_info import make_timestamp, parse_line
+
+## Arguments
+
+parser = argparse.ArgumentParser(description='Parsing DAQLog')
+parser.add_argument('-i', dest="Start")
+parser.add_argument('-f', dest="End")
+args = parser.parse_args()
 
 potDir = os.environ["potDir"]
 dbname = "%s/dbase/RunSummary.db"%(potDir)
@@ -24,8 +32,8 @@ override = True
 
 ## Range
 
-start_day = "2020-01-15"
-end_day = "2022-11-16"
+start_day = args.Start
+end_day = args.End
 
 ts_start_day = make_timestamp( start_day+" 00:00:00 CDT", "%Y-%m-%d %H:%M:%S %Z" )
 ts_end_day   = make_timestamp( end_day+" 23:59:59 CDT", "%Y-%m-%d %H:%M:%S %Z" )

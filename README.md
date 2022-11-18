@@ -37,8 +37,11 @@ mkdir -p ${potDir}/temp/
 ## Copy file from icarus gateway
 scp ${gatewayhostname}:/daq/log/DAQInterface_partition1.log ${potDir}/temp/  
 ## Run parsing script
-python ParseDAQLog.py
+python ParseDAQLog.py -i YYYY-MM-DD -f YYYY-MM-DD
 ```
+
+- ```-i YYYY-MM-DD```: Which day to start updating
+- ```-f YYYY-MM-DD```: Up to which day to update
 
 ## Update delivered POT
 
