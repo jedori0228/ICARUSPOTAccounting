@@ -1,12 +1,16 @@
 # ICARUS POT accounting script
 
-## Initial setup
+## Prerequisite
 [Conda](https://docs.conda.io/en/latest/miniconda.html) is recommended
 ```
 ## Creating environment from a .yml file (only need once)
 conda env create --name runco --file=CondaEnv/runco.yml
 ## Activating the environment (every time with new shell)
 conda acticate runco
+```
+
+## Setup
+```
 ## Running setup script (every time with new shell)
 source env_setup.sh
 ## source shared environment (every time with new shell)
