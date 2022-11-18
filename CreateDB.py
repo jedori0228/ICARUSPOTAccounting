@@ -15,6 +15,7 @@ create_run_timestamp = """ CREATE TABLE IF NOT EXISTS run_timestamp (
 run INTEGER NOT NULL,
 start TIMESTAMP NOT NULL,
 stop TIMESTAMP NOT NULL,
+conf TEXT,
 comment TEXT,
 UNIQUE( run )
   ); """

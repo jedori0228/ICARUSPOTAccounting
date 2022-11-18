@@ -299,6 +299,8 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
     pot_run_collected["ratio_bnb"] = pot_run_collected["pot_bnb_collected"] / pot_run_collected["pot_bnb_delivered"]
     pot_run_collected["ratio_numi"] = pot_run_collected["pot_numi_collected"] / pot_run_collected["pot_numi_delivered"]
 
+    pot_run_collected = pot_run_collected.sort_values('day')
+
     print(pot_run_collected)
 
     print("pot_bnb_collected = ",  np.median(pot_run_collected["pot_bnb_collected"]))

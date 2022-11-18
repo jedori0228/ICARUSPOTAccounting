@@ -20,7 +20,7 @@ if ClearTable:
   conn.commit()
 
 ## Override values
-override = False
+override = True
 
 ## Range
 
@@ -35,6 +35,7 @@ StartLine = 0
 
 edges = []
 recovers = []
+configs = []
 underedge = ["NULL",-1,-1]
 overedge = ["NULL",-1,-1]
 
@@ -82,6 +83,14 @@ for i_line in range(StartLine, len(lines)):
     elif timestamp >= ts_end_day: # or timestamp > ts_end_day:
        break
 
+  elif ("CONFIG transition underway" in line):
+    dummy, timestamp = parse_line(line)
+    nextline = lines[i_line+1].strip('\n')
+    configFile = "NULL"
+    if "Config name: " in nextline:
+      configFile = nextline.replace('Config name: ','')
+    configs.append([configFile, timestamp])
+
   else:
     continue
 
@@ -110,7 +119,8 @@ if len(edges) > 0:
 
     if RunNum==RunNum_next:
       if Status=="Start" and Status_next=="Stop":
-        intervals.append( [RunNum, TimeStamp, TimeStamp_next] )
+        intervals.append( [RunNum, TimeStamp, TimeStamp_next, ""] )
+
       elif Status=="Stop" and Status_next=="Start":
         ThisComment = "No run between %s ~ %s"%(dt.strftime("%Y-%m-%d %H:%M:%S"), dt_next.strftime("%Y-%m-%d %H:%M:%S"))
         #print(ThisComment)
@@ -156,15 +166,14 @@ if len(edges) > 0:
       ## This run is still running by the time the log file ended
         intervals.append( [RunNum, TimeStamp, ts_end_day, "RUNNING"] )
 
-for interval in intervals:
+for i_itv in range(0,len(intervals)):
+
+  interval = intervals[i_itv]
 
   run_value = interval[0]
   t0 = interval[1]
   t1 = interval[2]
-
-  Comment = ""
-  if len(interval)==4:
-    Comment = interval[3]
+  Comment = interval[3]
 
   t0_str = datetime.datetime.fromtimestamp(t0).strftime("%Y-%m-%d")
   t1_str = datetime.datetime.fromtimestamp(t1).strftime("%Y-%m-%d")
@@ -175,23 +184,34 @@ for interval in intervals:
 
   out.write("%s,%d,%d,\"%s\"\n"%(run_value,t0,t1,Comment))
 
+  ## find config file
+  ## config happend before run start
+  configFile = "NULL"
+  prevEnd = ts_start_day if i_itv==0 else intervals[i_itv-1][2]
+  for config in configs:
+    TimeStamp_conf = config[1]
+    dt_conf = datetime.datetime.fromtimestamp(TimeStamp_conf)
+    if prevEnd < TimeStamp_conf and TimeStamp_conf < t0:
+      configFile = config[0]
+
   if override:
-    print("Overriding run %s"%(run_value))
+    #print("Overriding run %s"%(run_value))
     deldql = "DELETE FROM run_timestamp WHERE run=%s"%(run_value)
     cur = conn.cursor()
     cur.execute(deldql)
     conn.commit()
 
-  sql = "INSERT INTO run_timestamp(run, start, stop, comment) VALUES(?,?,?,?)"
-  row_insert = (int(run_value), t0, t1, Comment)
+  sql = "INSERT INTO run_timestamp(run, start, stop, conf, comment) VALUES(?,?,?,?,?)"
+  row_insert = (int(run_value), t0, t1, configFile, Comment)
 
   cur = conn.cursor()
   ## if the comment in the currnet db is "RUNNING", we need to update this
   cur.execute('DELETE FROM run_timestamp WHERE (run=%s AND comment="RUNNING")'%(run_value))
   try:
+    #print(row_insert)
     cur.execute(sql, row_insert)
   except sqlite3.IntegrityError:
-    print("Values for run %s already exists. If you want to update the value, set override=True"%(run_value))
+    #print("Values for run %s already exists. If you want to update the value, set override=True"%(run_value))
     raise
   conn.commit()
 

@@ -260,6 +260,8 @@ def update_delivered_pot( conn, run, start, end, override=False ):
 
 def insert_daily_runs( conn, day_string ):
 
+    POTConfPattern = '''NOT (conf LIKE "%Calibration%") AND ( (conf LIKE "%physics%") OR (conf LIKE "%majority%") )'''
+
     # Use the day_string to get the UNIX timestamps of the start-end of the day
     ts_start_day = make_timestamp( day_string+" 00:00:00 CDT", "%Y-%m-%d %H:%M:%S %Z" )
     ts_end_day   = make_timestamp( day_string+" 23:59:59 CDT", "%Y-%m-%d %H:%M:%S %Z" )
@@ -277,7 +279,7 @@ def insert_daily_runs( conn, day_string ):
 
     ToMergedDF = []
 
-    run_prev = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start<%d) AND (stop>=%d)"%(ts_start_day,ts_start_day), conn_rts )
+    run_prev = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start<%d) AND (stop>=%d) AND (%s)"%(ts_start_day,ts_start_day,POTConfPattern), conn_rts )
     if run_prev.shape[0]>0:
       print("@@ Run prev")
       print(run_prev)
@@ -286,13 +288,13 @@ def insert_daily_runs( conn, day_string ):
         run_prev.at[0,"stop"] = ts_end_day
       ToMergedDF.append(run_prev)
 
-    run_contained = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start>=%d) AND (stop<=%d)"%(ts_start_day,ts_end_day), conn_rts )
+    run_contained = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start>=%d) AND (stop<=%d) AND (%s)"%(ts_start_day,ts_end_day,POTConfPattern), conn_rts )
     if run_contained.shape[0]>0:
       print("@@ Run contained")
       print(run_contained)
       ToMergedDF.append(run_contained)
 
-    run_continued = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start BETWEEN %d AND %d) AND (stop>=%d)"%(ts_start_day,ts_end_day,ts_end_day), conn_rts )
+    run_continued = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start BETWEEN %d AND %d) AND (stop>=%d) AND (%s)"%(ts_start_day,ts_end_day,ts_end_day, POTConfPattern), conn_rts )
     if run_continued.shape[0]>0:
       print("@@ Run continued")
       print(run_continued)
