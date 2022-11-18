@@ -30,7 +30,7 @@ cp /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/RunSummary.db ${potDi
 ```
 
 ## Parsing DAQInterface log file
-DAQIntercae log file (e.g., `DAQInterface_partition1.log`) contains typically ~2M lines. We parse this file and save the run start/stop times into a database, before we query BNB/NuMI DB.
+DAQIntercae log file (e.g., `DAQInterface_partition1.log`) contains typically O(1E6) lines. We parse this file and save the run start/stop times into a database, before we query BNB/NuMI DB.
 ```
 ## Creat temp directory if doesn't exist
 mkdir -p ${potDir}/temp/
