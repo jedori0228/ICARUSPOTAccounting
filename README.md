@@ -45,14 +45,14 @@ python ParseDAQLog.py -i YYYY-MM-DD -f YYYY-MM-DD
 
 ## Update delivered POT
 
-```python pot_account.py update-multi-daily-pot YYYY-MM-DD YYYY-MM-DD <True/False>```
+```python pot_account.py update-daily-pot YYYY-MM-DD YYYY-MM-DD <True/False>```
 
 - ```YYYY-MM-DD YYYY-MM-DD``` are the start and the end date to be updated
 - ```True/False``` are booleans for "override" option; True if you want to update the current table with new values
 
 ## Update collected POT
 
-```python pot_account.py update-multi-daily-runs YYYY-MM-DD YYYY-MM-DD <True/False>```
+```python pot_account.py update-daily-runs YYYY-MM-DD YYYY-MM-DD <True/False>```
 
 - ```YYYY-MM-DD YYYY-MM-DD``` are the start and the end date to be updated
 - ```True/False``` are booleans for "override" option; True if you want to update the current table with new values
