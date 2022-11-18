@@ -262,6 +262,8 @@ def insert_daily_runs( conn, day_string ):
 
     POTConfPattern = '''NOT (conf LIKE "%Calibration%") AND ( (conf LIKE "%physics%") OR (conf LIKE "%majority%") )'''
 
+    #POTConfPattern = '1' ## debugging
+
     # Use the day_string to get the UNIX timestamps of the start-end of the day
     ts_start_day = make_timestamp( day_string+" 00:00:00 CDT", "%Y-%m-%d %H:%M:%S %Z" )
     ts_end_day   = make_timestamp( day_string+" 23:59:59 CDT", "%Y-%m-%d %H:%M:%S %Z" )
@@ -271,7 +273,7 @@ def insert_daily_runs( conn, day_string ):
     dbname = "%s/dbase/RunSummary.db"%(potDir)
     conn_rts = create_connection(dbname)
     if conn_rts is None:
-        print("FAILED CONNECTION to %s"%(dbname))
+      print("FAILED CONNECTION to %s"%(dbname))
 
     print("@@ Day: %s"%(day_string))
     print("@@ ts_start_day = %d"%(ts_start_day))
@@ -304,6 +306,14 @@ def insert_daily_runs( conn, day_string ):
     conn_rts.close()
 
     if len(ToMergedDF)==0:
+
+      sql = "INSERT INTO daily_collected_pot(day, pot_bnb_collected, pot_numi_collected, runtime) VALUES(?,?,?,?)"
+      add_row = (day_string, 0., 0., 0.)
+
+      cur = conn.cursor()
+      cur.execute(sql, add_row)
+      conn.commit()
+
       return
 
     df_merged = pd.concat(ToMergedDF, ignore_index=True)
