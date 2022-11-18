@@ -7,13 +7,13 @@
 conda env create --name runco --file=CondaEnv/runco.yml
 ## Activating the environment (every time with new shell)
 conda acticate runco
-## Running setup script
+## Running setup script (every time with new shell)
 source env_setup.sh
-## If an initial db file is missing from ${potDir}/dbase/, create one
+## source shared environment (every time with new shell)
+source /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/shared_env_setup.sh
+## If an initial db file is missing from ${potDir}/dbase/, create one (only need once)
 mkdir -p dbase
 python CreateDB.py
-## source shared environment
-source /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/shared_env_setup.sh 
 ```
 
 ## Parsing DAQInterface log file
