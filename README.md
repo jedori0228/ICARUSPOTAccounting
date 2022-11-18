@@ -22,7 +22,7 @@ DAQIntercae log file (e.g., `DAQInterface_partition1.log`) contains typically ~2
 ## Creat temp directory if doesn't exist
 mkdir -p ${potDir}/temp/
 ## Copy file from icarus gateway
-scp <Put gateway address here>:/daq/log/DAQInterface_partition1.log ${potDir}/temp/  
+scp ${gatewayhostname}:/daq/log/DAQInterface_partition1.log ${potDir}/temp/  
 ## Run parsing script
 python ParseDAQLog.py
 ```
