@@ -15,9 +15,12 @@ conda acticate runco
 source env_setup.sh
 ## source shared environment (every time with new shell)
 source /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/shared_env_setup.sh
-## If an initial db file is missing from ${potDir}/dbase/, create one (only need once)
+## If an initial db file is missing from ${potDir}/dbase/, either
+## 1) Create a new one
 mkdir -p dbase
 python CreateDB.py
+## 2) Copy from existing one
+cp /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/RunSummary.db ${potDir}//dbase/
 ```
 
 ## Parsing DAQInterface log file
