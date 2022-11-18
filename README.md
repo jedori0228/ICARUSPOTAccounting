@@ -3,6 +3,12 @@
 ## Prerequisite
 [Conda](https://docs.conda.io/en/latest/miniconda.html) is recommended
 ```
+## Recommend /icarus/app/users/ for the miniconda installation
+cd /icarus/app/users/${USER}/
+## Get installer
+wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
+## Install
+bash Miniconda3-latest-Linux-x86_64.sh
 ## Creating environment from a .yml file (only need once)
 conda env create --name runco --file=CondaEnv/runco.yml
 ## Activating the environment (every time with new shell)
