@@ -172,7 +172,7 @@ if len(edges) > 0:
         break
     if not recFound:
       ## This run is still running by the time the log file ended
-        intervals.append( [RunNum, TimeStamp, ts_end_day, "RUNNING"] )
+      intervals.append( [RunNum, TimeStamp, ts_end_day, "RUNNING"] )
 
 for i_itv in range(0,len(intervals)):
 
@@ -193,7 +193,7 @@ for i_itv in range(0,len(intervals)):
   out.write("%s,%d,%d,\"%s\"\n"%(run_value,t0,t1,Comment))
 
   ## find config file
-  ## config happend before run start
+  ## config happens before the run start
   configFile = "NULL"
   prevEnd = ts_start_day if i_itv==0 else intervals[i_itv-1][2]
   for config in configs:
@@ -219,7 +219,7 @@ for i_itv in range(0,len(intervals)):
     #print(row_insert)
     cur.execute(sql, row_insert)
   except sqlite3.IntegrityError:
-    #print("Values for run %s already exists. If you want to update the value, set override=True"%(run_value))
+    print("Values for run %s already exists. If you want to update the value, set override=True"%(run_value))
     raise
   conn.commit()
 
