@@ -162,14 +162,22 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
 
     pot_run_collected = pot_run_collected.sort_values('day')
 
+    ## strip df by time range
+
+    pot_run_collected = pot_run_collected[ pd.to_datetime( pot_run_collected['day'] ) >= pd.to_datetime( start_day ) ]
+    pot_run_collected = pot_run_collected[ pd.to_datetime( pot_run_collected['day'] ) <= pd.to_datetime( end_day ) ]
+
+    ## Print final DataGrame
+
     print(pot_run_collected)
+
+    ## Values
 
     print("pot_bnb_collected = ",  np.median(pot_run_collected["pot_bnb_collected"]))
     print("pot_numi_collected = ", np.median(pot_run_collected["pot_numi_collected"]))
 
     print("pot_bnb_delivered = ",  np.median(pot_run_collected["pot_bnb_delivered"]))
     print("pot_numi_delivered = ", np.median(pot_run_collected["pot_numi_delivered"]))
-
 
     print("ratio_bnb = ",  np.median(pot_run_collected["ratio_bnb"]))
     print("ratio_numi = ", np.median(pot_run_collected["ratio_numi"]))
