@@ -53,8 +53,10 @@ def parse_line( line ):
 
 def insert_daily_runs( conn, day_string ):
 
+    ## Only count Physics or Majority configs, and skip Calibration
     POTConfPattern = '''NOT (conf LIKE "%Calibration%") AND ( (conf LIKE "%physics%") OR (conf LIKE "%majority%") )'''
 
+    ## Cound all configuration
     #POTConfPattern = '1' ## debugging
 
     # Use the day_string to get the UNIX timestamps of the start-end of the day
