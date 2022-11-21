@@ -171,18 +171,36 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
 
     print(pot_run_collected)
 
-    ## Values
+    ## Median
 
-    print("pot_bnb_collected = ",  np.median(pot_run_collected["pot_bnb_collected"]))
-    print("pot_numi_collected = ", np.median(pot_run_collected["pot_numi_collected"]))
+    print("@@ Medians")
 
-    print("pot_bnb_delivered = ",  np.median(pot_run_collected["pot_bnb_delivered"]))
-    print("pot_numi_delivered = ", np.median(pot_run_collected["pot_numi_delivered"]))
+    print("pot_bnb_collected = ",  np.median(pot_run_collected["pot_bnb_collected"]) )
+    print("pot_numi_collected = ", np.median(pot_run_collected["pot_numi_collected"]) )
 
-    print("ratio_bnb = ",  np.median(pot_run_collected["ratio_bnb"]))
-    print("ratio_numi = ", np.median(pot_run_collected["ratio_numi"]))
-    print("runtime = ",  np.median(pot_run_collected["runtime"]))
+    print("pot_bnb_delivered = ",  np.median(pot_run_collected["pot_bnb_delivered"]) )
+    print("pot_numi_delivered = ", np.median(pot_run_collected["pot_numi_delivered"]) )
 
+    print("ratio_bnb = ",  np.median(pot_run_collected["ratio_bnb"]) )
+    print("ratio_numi = ", np.median(pot_run_collected["ratio_numi"]) )
+    print("runtime = ",  np.median(pot_run_collected["runtime"]) )
+
+    ## Sum
+
+    print("@@ Sum")
+
+    print("BNB")
+    print("- Delivered = %1.2e POT"%(np.sum(pot_run_collected["pot_bnb_delivered"])*1E12) )
+    print("- Collected = %1.2e POT"%(np.sum(pot_run_collected["pot_bnb_collected"])*1E12) )
+    print("- Collected/Delivered = %1.3f"%(np.sum(pot_run_collected["pot_bnb_collected"])/np.sum(pot_run_collected["pot_bnb_delivered"])) )
+    print("NuMI")
+    print("- Delivered = %1.2e POT"%(np.sum(pot_run_collected["pot_numi_delivered"])*1E12) )
+    print("- Collected = %1.2e POT"%(np.sum(pot_run_collected["pot_numi_collected"])*1E12) )
+    print("- Collected/Delivered = %1.3f"%(np.sum(pot_run_collected["pot_numi_collected"])/np.sum(pot_run_collected["pot_numi_delivered"])) )
+    sumRunTime = np.sum(pot_run_collected["runtime"])
+    print("Runtime = %d sec"%( int(sumRunTime) ) )
+    print("        = %1.1f hrs"%( sumRunTime/3600. ) )
+    print("        = %1.1f days"%( sumRunTime/3600./24. ) )
 
     # MAKE PLOTS, SAVE THEM 
     plt = makePOTPlot(pot_run_collected, "bnb", time_range)
@@ -199,7 +217,6 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
 
     plt = makePOTPlotBoth( pot_run_collected, "numi", "bnb", time_range)
     plt.savefig("fig/cumulative_pot_numi_bnb.pdf")
-
 
     plt = makeDAQEffPlot( pot_run_collected, time_range )
     plt.savefig("fig/eff_daq_numi_bnb.pdf")

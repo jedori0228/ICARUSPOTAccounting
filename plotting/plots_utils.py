@@ -178,9 +178,9 @@ def makeDAQEffPlot( pot_daily_collected, range ):
 
     ax.plot( pd.to_datetime(pot_daily_collected["day"], utc=True), pot_daily_collected["runtime"]/(3600.)/norm, '-.', color="#E48900", linewidth=5, label="DAQ Uptime")
 
-    print( mode( pot_daily_collected["runtime"]/(3600.)) )
-    print( np.median( pot_daily_collected["runtime"]/(3600.)/norm) )
-    print( np.mean( pot_daily_collected["runtime"]/(3600.)) )
+    #print( mode( pot_daily_collected["runtime"]/(3600.)) )
+    #print( np.median( pot_daily_collected["runtime"]/(3600.)/norm) )
+    #print( np.mean( pot_daily_collected["runtime"]/(3600.)) )
     
     ax.yaxis.grid(True, linestyle='--')
 
