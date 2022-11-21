@@ -63,6 +63,13 @@ def insert_daily_runs( conn, day_string ):
     ts_start_day = make_timestamp( day_string+" 00:00:00 CDT", "%Y-%m-%d %H:%M:%S %Z" )
     ts_end_day   = make_timestamp( day_string+" 23:59:59 CDT", "%Y-%m-%d %H:%M:%S %Z" )
 
+    # Getting the current date and time
+    dt_now = datetime.datetime.now()
+    ts_now = datetime.datetime.timestamp(dt_now)
+    if ts_now<ts_end_day:
+      print("@@ Now %s is not finished.. replacing \"ts_end_day\" to now")
+      ts_end_day = ts_now
+
     ## Run timestamp db
 
     dbname = "%s/dbase/RunSummary.db"%(potDir)
