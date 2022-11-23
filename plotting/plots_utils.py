@@ -159,8 +159,8 @@ def makePOTSumPlot( df, beam, range ):
     ax0.tick_params(axis="x",direction="in", bottom="on")
 
     ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y'))
-    ax0.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-    plt.xticks(rotation=90)#, fontweight='light',  fontsize='x-small',)
+    #ax0.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
+    #plt.xticks(rotation=90)#, fontweight='light',  fontsize='x-small',)
     ax0.legend(fontsize=18, loc='upper left')
 
     ax0.set_xlim( pd.to_datetime( range[0], utc=True ), pd.to_datetime( range[1], utc=True ) )
