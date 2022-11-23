@@ -64,3 +64,6 @@ python ParseDAQLog.py -i YYYY-MM-DD -f YYYY-MM-DD
 ```python pot_account.py make-daq-plots YYYY-MM-DD YYYY-MM-DD```
 
 - ```YYYY-MM-DD YYYY-MM-DD``` are the start and the end date to be updated
+
+## To get the updates from github
+`git pull`
