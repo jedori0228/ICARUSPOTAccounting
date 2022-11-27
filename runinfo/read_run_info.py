@@ -72,18 +72,13 @@ def insert_daily_runs( conn, day_string ):
 
     ## Run timestamp db
 
-    dbname = "%s/dbase/RunSummary.db"%(potDir)
-    conn_rts = create_connection(dbname)
-    if conn_rts is None:
-      print("FAILED CONNECTION to %s"%(dbname))
-
     print("@@ Day: %s"%(day_string))
     print("@@ ts_start_day = %d"%(ts_start_day))
     print("@@ ts_end_day = %d"%(ts_end_day))
 
     ToMergedDF = []
 
-    run_prev = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start<%d) AND (stop>=%d) AND (%s)"%(ts_start_day,ts_start_day,POTConfPattern), conn_rts )
+    run_prev = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start<%d) AND (stop>=%d) AND (%s)"%(ts_start_day,ts_start_day,POTConfPattern), conn )
     if run_prev.shape[0]>0:
       print("@@ Run prev")
       print(run_prev)
@@ -92,20 +87,18 @@ def insert_daily_runs( conn, day_string ):
         run_prev.at[0,"stop"] = ts_end_day
       ToMergedDF.append(run_prev)
 
-    run_contained = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start>=%d) AND (stop<=%d) AND (%s)"%(ts_start_day,ts_end_day,POTConfPattern), conn_rts )
+    run_contained = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start>=%d) AND (stop<%d) AND (%s)"%(ts_start_day,ts_end_day,POTConfPattern), conn )
     if run_contained.shape[0]>0:
       print("@@ Run contained")
       print(run_contained)
       ToMergedDF.append(run_contained)
 
-    run_continued = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start BETWEEN %d AND %d) AND (stop>=%d) AND (%s)"%(ts_start_day,ts_end_day,ts_end_day, POTConfPattern), conn_rts )
+    run_continued = pd.read_sql( "SELECT * FROM run_timestamp WHERE (start BETWEEN %d AND %d) AND (stop>=%d) AND (%s)"%(ts_start_day,ts_end_day,ts_end_day, POTConfPattern), conn )
     if run_continued.shape[0]>0:
       print("@@ Run continued")
       print(run_continued)
       run_continued.at[0,"stop"] = ts_end_day
       ToMergedDF.append(run_continued)
-
-    conn_rts.close()
 
     if len(ToMergedDF)==0:
 
@@ -150,8 +143,4 @@ def insert_daily_runs( conn, day_string ):
     cur.execute(sql, add_row)
     conn.commit()
 
-
-    #print('total runtime',total_runtime)
-    #REMOVE the DAQInterface_partition1 log file from the temp folder        
-    #os.system( "rm temp/DAQInterface_partition1.log" )
 
