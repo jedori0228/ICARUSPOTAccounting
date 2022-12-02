@@ -18,7 +18,7 @@ from utils.dbmanager import add_day_pot_beam, create_connection, create_table, r
 from runinfo.read_run_info import insert_daily_runs, make_timestamp, get_day_range
 
 from plotting.plots_utils import makePOTPlot, makePOTSumPlot, makeDAQEffPlot, makePOTPlotBoth
-from plotting.plots_utils import makePOTPlotRun, makePOTSumPlotRun, makeDAQEffPlotRun, makePOTPlotBothRun
+from plotting.plots_utils import makePOTPlotRun, makePOTSumPlotRun, makeIntesityAndPOTSumPlot, makeDAQEffPlotRun, makePOTPlotBothRun
 
 USER = os.environ['USER']
 potDir = os.environ['potDir']
@@ -229,12 +229,18 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
     plt = makePOTSumPlot( pot_run_collected, "numi", time_range)
     plt.savefig("fig/cumulative_pot_numi.pdf")
 
+    plt = makeIntesityAndPOTSumPlot( pot_run_collected, "bnb", time_range)
+    plt.savefig("fig/intensity_and_cumulative_pot_bnb.pdf")
+
+    plt = makeIntesityAndPOTSumPlot( pot_run_collected, "numi", time_range)
+    plt.savefig("fig/intensity_and_cumulative_pot_numi.pdf")
+
     plt = makePOTPlotBoth( pot_run_collected, "numi", "bnb", time_range)
     plt.savefig("fig/cumulative_pot_numi_bnb.pdf")
 
     plt = makeDAQEffPlot( pot_run_collected, time_range )
     plt.savefig("fig/eff_daq_numi_bnb.pdf")
-    #plt.show()
+    plt.show()
     
     return
 
