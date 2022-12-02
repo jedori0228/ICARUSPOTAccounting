@@ -23,7 +23,9 @@ UNIQUE( run )
 create_daily_collected_pot = """ CREATE TABLE IF NOT EXISTS daily_collected_pot (
 day TEXT NOT NULL,
 pot_bnb_collected REAL NOT NULL,
+spill_bnb_collected INTEGER NOT NULL,
 pot_numi_collected REAL NOT NULL,
+spill_numi_collected INTEGER NOT NULL,
 runtime REAL NOT NULL,
 UNIQUE( day )
   ); """
@@ -32,12 +34,16 @@ UNIQUE( day )
 create_day_pot_bnb = """ CREATE TABLE IF NOT EXISTS day_pot_bnb (
 day text PRIMARY KEY,
 pot real NOT NULL,
+spill integer NOT NULL,
+mode text NOT NULL,
 UNIQUE( day )
 ); """
 
 create_day_pot_numi = """ CREATE TABLE IF NOT EXISTS day_pot_numi (
 day text PRIMARY KEY,
 pot real NOT NULL,
+spill integer NOT NULL,
+mode text NOT NULL,
 UNIQUE( day )
 ); """
 
