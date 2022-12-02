@@ -102,8 +102,8 @@ def insert_daily_runs( conn, day_string ):
 
     if len(ToMergedDF)==0:
 
-      sql = "INSERT INTO daily_collected_pot(day, pot_bnb_collected, pot_numi_collected, runtime) VALUES(?,?,?,?)"
-      add_row = (day_string, 0., 0., 0.)
+      sql = "INSERT INTO daily_collected_pot(day, pot_bnb_collected, spill_bnb_collected, pot_numi_collected, spill_numi_collected, runtime) VALUES(?,?,?,?,?,?)"
+      add_row = (day_string, 0., 0, 0., 0, 0.)
 
       cur = conn.cursor()
       cur.execute(sql, add_row)
@@ -116,7 +116,9 @@ def insert_daily_runs( conn, day_string ):
     print(df_merged)
 
     sum_pot_bnb_value = 0.
+    sum_spill_bnb_value = 0
     sum_pot_numi_value = 0.
+    sum_spill_numi_value = 0
     sum_runtime = 0.
 
     for i in range(0,df_merged.shape[0]):
@@ -124,20 +126,22 @@ def insert_daily_runs( conn, day_string ):
       start = df_merged.at[i,"start"]
       stop = df_merged.at[i,"stop"]
 
-      pot_bnb_value =  float( query_pot_interval(start, stop, "E:TOR875", "1d") )
-      pot_numi_value = float( query_pot_interval(start, stop, "E:TORTGT", "a9") )
+      pot_bnb_value, spill_bnb_value =  query_pot_interval(start, stop, "E:TOR875", "1d")
+      pot_numi_value, spill_numi_value  = query_pot_interval(start, stop, "E:TORTGT", "a9")
       runtime = stop-start
 
       sum_pot_bnb_value += pot_bnb_value
+      sum_spill_bnb_value += spill_bnb_value
       sum_pot_numi_value += pot_numi_value
+      sum_spill_numi_value += spill_numi_value
       sum_runtime += runtime
 
       #print(run,start,stop,pot_bnb_value,pot_numi_value)
 
     print(day_string, sum_pot_bnb_value, sum_pot_numi_value, sum_runtime)
 
-    sql = "INSERT INTO daily_collected_pot(day, pot_bnb_collected, pot_numi_collected, runtime) VALUES(?,?,?,?)"
-    add_row = (day_string, sum_pot_bnb_value, sum_pot_numi_value, sum_runtime)
+    sql = "INSERT INTO daily_collected_pot(day, pot_bnb_collected, spill_bnb_collected, pot_numi_collected, spill_numi_collected, runtime) VALUES(?,?,?,?,?,?)"
+    add_row = (day_string, sum_pot_bnb_value, sum_spill_bnb_value, sum_pot_numi_value, sum_spill_numi_value, sum_runtime)
 
     cur = conn.cursor()
     cur.execute(sql, add_row)

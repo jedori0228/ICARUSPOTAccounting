@@ -72,8 +72,14 @@ def update_daily_pot( ctx, start_day="", end_day="", override=False ):
           
           ts_start_day = make_timestamp( day+" 00:00:00 CDT", "%Y-%m-%d %H:%M:%S %Z" )
           ts_end_day   = make_timestamp( day+" 23:59:59 CDT", "%Y-%m-%d %H:%M:%S %Z" )
-          add_day_pot_beam( conn, ( day, query_full_day(ts_start_day,ts_end_day, "E:TORTGT", "a9") ), "numi" )
-          add_day_pot_beam( conn, ( day, query_full_day(ts_start_day,ts_end_day, "E:TOR875", "1d") ), "bnb")
+
+          numi_beam_info = query_full_day(ts_start_day,ts_end_day, "numi")
+          bnb_beam_info = query_full_day(ts_start_day,ts_end_day, "bnb")
+
+          add_day_pot_beam( conn, ( day, numi_beam_info[0], numi_beam_info[1], numi_beam_info[2]), "numi" )
+          add_day_pot_beam( conn, ( day, bnb_beam_info[0], bnb_beam_info[1], bnb_beam_info[2]), "bnb")
+
+          #add_day_beam_info( conn, day, ts_start_day, ts_end_day, "numi" )
           
           print(" ALL pot delivered information updated for day {} ".format(day))
          
@@ -153,12 +159,19 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
     # Merge BNB
     pot_run_collected = pot_run_collected.join( pot_daily_bnb.set_index("day"), on="day" ) 
     pot_run_collected.rename( columns={ "pot" : "pot_bnb_delivered"}, inplace=True )
+    pot_run_collected.rename( columns={ "spill" : "spill_bnb_delivered"}, inplace=True )
+    pot_run_collected.rename( columns={ "mode" : "mode_bnb"}, inplace=True )
     # Merge Numi
     pot_run_collected = pot_run_collected.join( pot_daily_numi.set_index("day"), on="day" ) 
     pot_run_collected.rename( columns={ "pot" : "pot_numi_delivered"}, inplace=True )
+    pot_run_collected.rename( columns={ "spill" : "spill_numi_delivered"}, inplace=True )
+    pot_run_collected.rename( columns={ "mode" : "mode_numi"}, inplace=True )
 
     pot_run_collected["ratio_bnb"] = pot_run_collected["pot_bnb_collected"] / pot_run_collected["pot_bnb_delivered"]
     pot_run_collected["ratio_numi"] = pot_run_collected["pot_numi_collected"] / pot_run_collected["pot_numi_delivered"]
+
+    pot_run_collected["bnb_intensity"] = pot_run_collected["pot_bnb_delivered"]/ pot_run_collected["spill_bnb_delivered"]*1E12
+    pot_run_collected["numi_intensity"] = pot_run_collected["pot_numi_delivered"]/ pot_run_collected["spill_numi_delivered"]*1E12
 
     pot_run_collected = pot_run_collected.sort_values('day')
 
@@ -190,12 +203,12 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
     print("@@ Sum")
 
     print("BNB")
-    print("- Delivered = %1.2e POT"%(np.sum(pot_run_collected["pot_bnb_delivered"])*1E12) )
-    print("- Collected = %1.2e POT"%(np.sum(pot_run_collected["pot_bnb_collected"])*1E12) )
+    print("- Delivered = %1.2e POT, %d spills"%(np.sum(pot_run_collected["pot_bnb_delivered"])*1E12, np.sum(pot_run_collected["spill_bnb_delivered"])) )
+    print("- Collected = %1.2e POT, %d spills"%(np.sum(pot_run_collected["pot_bnb_collected"])*1E12, np.sum(pot_run_collected["spill_bnb_collected"])) )
     print("- Collected/Delivered = %1.3f"%(np.sum(pot_run_collected["pot_bnb_collected"])/np.sum(pot_run_collected["pot_bnb_delivered"])) )
     print("NuMI")
-    print("- Delivered = %1.2e POT"%(np.sum(pot_run_collected["pot_numi_delivered"])*1E12) )
-    print("- Collected = %1.2e POT"%(np.sum(pot_run_collected["pot_numi_collected"])*1E12) )
+    print("- Delivered = %1.2e POT, %d spills"%(np.sum(pot_run_collected["pot_numi_delivered"])*1E12, np.sum(pot_run_collected["spill_numi_delivered"])) )
+    print("- Collected = %1.2e POT, %d spills"%(np.sum(pot_run_collected["pot_numi_collected"])*1E12, np.sum(pot_run_collected["spill_numi_collected"])) )
     print("- Collected/Delivered = %1.3f"%(np.sum(pot_run_collected["pot_numi_collected"])/np.sum(pot_run_collected["pot_numi_delivered"])) )
     sumRunTime = np.sum(pot_run_collected["runtime"])
     print("Runtime = %d sec"%( int(sumRunTime) ) )
@@ -203,6 +216,7 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
     print("        = %1.1f days"%( sumRunTime/3600./24. ) )
 
     # MAKE PLOTS, SAVE THEM 
+
     plt = makePOTPlot(pot_run_collected, "bnb", time_range)
     plt.savefig("fig/eff_pot_bnb.pdf")
     
@@ -220,7 +234,7 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
 
     plt = makeDAQEffPlot( pot_run_collected, time_range )
     plt.savefig("fig/eff_daq_numi_bnb.pdf")
-    plt.show()
+    #plt.show()
     
     return
 

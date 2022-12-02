@@ -84,7 +84,7 @@ def add_day_pot_beam( conn, row_insert, beam ):
 	Add to the day_pot_bnb and day_pot_numi
 	"""
 
-	sql = "INSERT INTO day_pot_{}(day, pot) VALUES(?,?)".format(beam)
+	sql = "INSERT INTO day_pot_{}(day, pot, spill, mode) VALUES(?,?,?,?)".format(beam)
 
 	cur = conn.cursor()
 	cur.execute(sql, row_insert)
