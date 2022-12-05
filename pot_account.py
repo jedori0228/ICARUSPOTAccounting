@@ -216,7 +216,6 @@ def make_daq_plots( ctx, start_day="", end_day="" ):
     print("        = %1.1f days"%( sumRunTime/3600./24. ) )
 
     # MAKE PLOTS, SAVE THEM 
-
     plt = makePOTPlot(pot_run_collected, "bnb", time_range)
     plt.savefig("fig/eff_pot_bnb.pdf")
     

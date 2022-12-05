@@ -3,32 +3,39 @@
 ## Prerequisite
 [Conda](https://docs.conda.io/en/latest/miniconda.html) is recommended
 ```
-## Recommend /icarus/app/users/ for the miniconda installation
+# Recommend /icarus/app/users/ for the miniconda installation
 cd /icarus/app/users/${USER}/
-## Get installer
+# Download the installer
 wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
-## Install
-## It asks you where to install the package. Default is ${HOME}, but 
-## should be changed to /icarus/app/users/${USER}/miniconda3/
+# Run the installer
 bash Miniconda3-latest-Linux-x86_64.sh 
-## Creating environment from a .yml file (only need once)
+# It asks you where to install the package. Default is ${HOME}, but
+# should be changed to /icarus/app/users/${USER}/miniconda3/
+# Creating environment from a .yml file (only need once)
 conda env create --name runco --file=CondaEnv/runco.yml
-## Activating the environment (every time with new shell)
+# Activating the environment (every time with new shell)
 conda activate runco
+```
+
+## For committing to Fermilab directorate performance database
+```
+# We need oracle db libraries
+# Download the installer
+wget https://download.oracle.com/otn_software/linux/instantclient/218000/instantclient-basic-linux.x64-21.8.0.0.0dbru.zip
+# Unzip
+unzip instantclient-basic-linux.x64-21.8.0.0.0dbru.zip
 ```
 
 ## Setup
 ```
-## Running setup script (every time with new shell)
+# Running setup script (every time with new shell)
 source env_setup.sh
-## source shared environment (every time with new shell)
-source /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/shared_env_setup.sh
-## If an initial db file is missing from ${potDir}/dbase/, either
-## 1) Create a new one
+# If an initial db file is missing from ${potDir}/dbase/, either
+# 1) Create a new one
 mkdir -p dbase
 python CreateDB.py
-## 2) Copy from existing one
-cp /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/RunSummary.db ${potDir}//dbase/
+# 2) Copy from existing one
+cp /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/RunSummary.db ${potDir}/dbase/
 ```
 
 ## Parsing DAQInterface log file
@@ -64,6 +71,16 @@ python ParseDAQLog.py -i YYYY-MM-DD -f YYYY-MM-DD
 ```python pot_account.py make-daq-plots YYYY-MM-DD YYYY-MM-DD```
 
 - ```YYYY-MM-DD YYYY-MM-DD``` are the start and the end date to be updated
+
+## Commit weekly report to Fermilab directorate performance database
+
+```
+# -i: Start day, should be Monday
+# -f: Do not use the option -f, unless for debugging purpose. End date will be automatically set to Sunday
+# --no_commit: Do not commit the data; Run this before you update date the DB
+python UpdateFermiDB.py -i YYYY-MM-DD --dev # Update the Develop area for debugigng
+python UpdateFermiDB.py -i YYYY-MM-DD --prod # Update the Prodcution area
+```
 
 ## To get the updates from github
 `git pull`

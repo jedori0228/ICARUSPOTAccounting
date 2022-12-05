@@ -43,7 +43,7 @@ def makePOTPlot( df, beam, range ):
 
     ax0.tick_params(axis="x",direction="in", bottom="on")
 
-    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y'))
+    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
 
     time_margin = pd.to_timedelta('0.5 days')
 
@@ -60,7 +60,7 @@ def makePOTPlot( df, beam, range ):
     ax1.plot(x, df[ratio_label], 'o', color='black', markersize=10, markerfacecolor='gray', markeredgecolor='black', markeredgewidth=2)
 
     ax1.tick_params(axis="x",direction="in", bottom="on",top='on')
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y'))
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
     ax1.set_xlim( pd.to_datetime( range[0], utc=True ) - time_margin, pd.to_datetime( range[1], utc=True ) + time_margin )
 
     ax1.tick_params(axis="y",direction="in", left="on", right='on')
@@ -78,7 +78,7 @@ def makePOTPlotBoth( df, beam1, beam2,range ):
 
     fig, ax0 = plt.subplots( 1,1, figsize=(16, 6.0), sharey=True )
 
-    ax0.set_title(beam1.upper(), fontsize=18)
+    #ax0.set_title(beam1.upper(), fontsize=18)
 
     del_label1="pot_%s_delivered" % beam1
  
@@ -111,7 +111,7 @@ def makePOTPlotBoth( df, beam1, beam2,range ):
 
     ax0.tick_params(axis="x",direction="in", bottom="on")
 
-    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y'))
+    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
 
     ax0.legend(fontsize=18, loc='upper left')
 
@@ -150,7 +150,7 @@ def makePOTSumPlot( df, beam, range ):
     
     ax0.tick_params(axis="x",direction="in", bottom="on")
 
-    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y'))
+    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
     #ax0.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
     #plt.xticks(rotation=90)#, fontweight='light',  fontsize='x-small',)
     #ax0.legend(fontsize=18, loc='upper left')
@@ -209,7 +209,7 @@ def makeIntesityAndPOTSumPlot( df, beam, range ):
     
     ax1.tick_params(axis="x",direction="in", bottom="on")
 
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y'))
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
     #ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
     #plt.xticks(rotation=90)#, fontweight='light',  fontsize='x-small',)
     #ax.legend(fontsize=18, loc='upper left')
@@ -231,6 +231,13 @@ def makeDAQEffPlot( pot_daily_collected, range ):
 
     ax.plot( pd.to_datetime(pot_daily_collected["day"], utc=True), pot_daily_collected["runtime"]/(3600.)/norm, '-.', color="#E48900", linewidth=5, label="DAQ Uptime")
 
+    nDays = (pd.to_datetime( range[1], utc=True ) - pd.to_datetime( range[0], utc=True ) ).days + 1
+    totalRunTime = np.sum(pot_daily_collected["runtime"])/3600./24. # in days
+    print("@@ DAQ efficiency")
+    print("- Number of days between %s ~ %s = %d"%(range[0], range[1], nDays))
+    print("- Total run time in this period = %1.2f days"%(totalRunTime))
+    print("- DAQ efficiency = (DAQ running time)/(Time interval) = %1.3f"%(totalRunTime/float(nDays)))
+
     #print( mode( pot_daily_collected["runtime"]/(3600.)) )
     #print( np.median( pot_daily_collected["runtime"]/(3600.)/norm) )
     #print( np.mean( pot_daily_collected["runtime"]/(3600.)) )
@@ -240,7 +247,7 @@ def makeDAQEffPlot( pot_daily_collected, range ):
     ax.tick_params(axis="y",direction="in", left="on", right='on')
     ax.tick_params(axis="x",direction="in", bottom="on",top='on')
     ax.set_ylim((0.0, 1.1))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
     ax.set_ylabel( "DAQ Time / 24 hours", fontsize=16 )
 
     ax1 = ax.twinx()
@@ -299,7 +306,7 @@ def makePOTPlotRun( df, beam, run ):
 
     ax0.tick_params(axis="x",direction="in", bottom="on")
 
-    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y'))
+    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
 
     ax0.set_xlim( pd.to_datetime( range[0], utc=True ), pd.to_datetime( range[1], utc=True ) )
 
@@ -317,7 +324,7 @@ def makePOTPlotRun( df, beam, run ):
     #ax0.grid(True, linestyle='--')
     ax1.tick_params(axis="y",direction="in", left="on", right='on')
     ax1.tick_params(axis="x",direction="in", bottom="on",top='on')
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y'))
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
     
     ax1.set_xlim( pd.to_datetime( range[0], utc=True ), pd.to_datetime( range[1], utc=True ) )
 
@@ -370,7 +377,7 @@ def makePOTPlotBothRun( df, beam1, beam2,run ):
 
     ax0.tick_params(axis="x",direction="in", bottom="on")
 
-    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
 
     ax0.legend(fontsize=18, loc='upper left')
 
@@ -413,7 +420,7 @@ def makePOTSumPlotRun( df, beam, run ):
     
     ax0.tick_params(axis="x",direction="in", bottom="on")
 
-    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+    ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
 
     ax0.legend(fontsize=18, loc='upper left')
 
