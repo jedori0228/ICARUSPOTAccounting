@@ -76,7 +76,7 @@ python ParseDAQLog.py -i YYYY-MM-DD -f YYYY-MM-DD
 
 ```
 # -i: Start day, should be Monday
-# -f: Do not use the option -f, unless for debugging purpose. End date will be automatically set to Sunday
+# (-f: Optional; End date will be automatically set to Sunday)
 # --no_commit: Do not commit the data; Run this before you update date the DB
 python UpdateFermiDB.py -i YYYY-MM-DD --dev # Update the Develop area for debugigng
 python UpdateFermiDB.py -i YYYY-MM-DD --prod # Update the Prodcution area
