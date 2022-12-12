@@ -82,5 +82,9 @@ python UpdateFermiDB.py -i YYYY-MM-DD --dev # Update the Develop area for debugi
 python UpdateFermiDB.py -i YYYY-MM-DD --prod # Update the Prodcution area
 ```
 
+You can check the committed data from (need VPN if you are offsite)
+- Develop area: https://ccdapps-dev.fnal.gov/pls/apex/f?p=104:24:6225178094583:::::
+- Production area: https://ccdapps-prod.fnal.gov/pls/apex/f?p=104:24:10209521398010:::::
+
 ## To get the updates from github
 `git pull`
