@@ -86,7 +86,5 @@ You can check the committed data from (need VPN if you are offsite)
 - Develop area: https://ccdapps-dev.fnal.gov/pls/apex/f?p=104
 - Production area: https://ccdapps-prod.fnal.gov/pls/apex/f?p=104
 
-https://ccdapps-prod.fnal.gov/pls/apex/f?p=104
-
 ## To get the updates from github
 `git pull`
