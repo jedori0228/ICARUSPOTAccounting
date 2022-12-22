@@ -4,6 +4,7 @@ import datetime
 import numpy as np
 import sqlite3
 import argparse
+import pytz
 
 from utils.dbmanager import add_run_day_pot, add_run_pot, create_connection, create_table
 from beaminfo.simple_query import query_pot_interval
@@ -19,6 +20,31 @@ args = parser.parse_args()
 potDir = os.environ["potDir"]
 dbname = "%s/dbase/RunSummary.db"%(potDir)
 conn = create_connection(dbname)
+
+## Check if there's any "RUNNING" state
+RunningStateCheckSQL = 'select * from run_timestamp WHERE comment="RUNNING";'
+cur = conn.cursor()
+cur.execute(RunningStateCheckSQL)
+RunningStateCheckOutput = cur.fetchall()
+if len(RunningStateCheckOutput)>0:
+  for line in RunningStateCheckOutput:
+    # (9294, 1671406288, 1671602399, 'Physics_General_thr400_Majority_5_7_nb_OverlappingWindow_00001', 'RUNNING')
+    runNum = line[0]
+    startTS = line[1]
+    endTS = line[2]
+
+    startDT_utc = datetime.datetime.fromtimestamp(startTS, datetime.timezone.utc)
+    endDT_utc = datetime.datetime.fromtimestamp(endTS, datetime.timezone.utc)
+
+    startDT_fnal = startDT_utc.astimezone(pytz.timezone('America/Chicago'))
+    endDT_fnal = endDT_utc.astimezone(pytz.timezone('America/Chicago'))
+
+    print("@@ Run %d was in RUNNING state (%s ~ %s)"%(runNum, startDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z"), endDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z")))
+
+    startDate_fnal = startDT_fnal.date().isoformat()
+    print("@@ -> Setting Start date to %s"%(startDate_fnal))
+    args.Start = startDate_fnal
+    break
 
 ## Clear and write it again from scatch
 ClearTable = False
@@ -113,13 +139,13 @@ if len(edges) > 0:
     Status = edge[0]
     RunNum = edge[1] # string
     TimeStamp = edge[2]
-    dt = datetime.datetime.fromtimestamp(TimeStamp)
+    dt = datetime.datetime.fromtimestamp(TimeStamp, datetime.timezone.utc)
 
     edge_next = edges[idx+1]
     Status_next = edge_next[0]
     RunNum_next = edge_next[1] # string
     TimeStamp_next = edge_next[2]
-    dt_next = datetime.datetime.fromtimestamp(TimeStamp_next)
+    dt_next = datetime.datetime.fromtimestamp(TimeStamp_next, datetime.timezone.utc)
 
     #print("@@@@@@@@@@@@@")
     #print(edge)
@@ -141,7 +167,7 @@ if len(edges) > 0:
         ## Run crashed without clear stop. Look for first recover after start
         for recover in recovers:
           TimeStamp_rec = recover[1]
-          dt_rec = datetime.datetime.fromtimestamp(TimeStamp_rec)
+          dt_rec = datetime.datetime.fromtimestamp(TimeStamp_rec, datetime.timezone.utc)
           if TimeStamp < TimeStamp_rec and TimeStamp_rec < TimeStamp_next:
             intervals.append( [RunNum, TimeStamp, TimeStamp_rec, "CRASH"] )
             break
@@ -158,13 +184,13 @@ if len(edges) > 0:
     Status = edge[0]
     RunNum = edge[1] # string
     TimeStamp = edge[2]
-    dt = datetime.datetime.fromtimestamp(TimeStamp)
+    dt = datetime.datetime.fromtimestamp(TimeStamp, datetime.timezone.utc)
 
     ## The last edge is a run start. Let see if we have a recover after this"
     recFound=False
     for recover in recovers:
       TimeStamp_rec = recover[1]
-      dt_rec = datetime.datetime.fromtimestamp(TimeStamp_rec)
+      dt_rec = datetime.datetime.fromtimestamp(TimeStamp_rec, datetime.timezone.utc)
       if TimeStamp < TimeStamp_rec and TimeStamp_rec < ts_end_day:
         ## This run crashed before the end of the DAQ log
         recFound = True
@@ -183,8 +209,8 @@ for i_itv in range(0,len(intervals)):
   t1 = interval[2]
   Comment = interval[3]
 
-  t0_str = datetime.datetime.fromtimestamp(t0).strftime("%Y-%m-%d")
-  t1_str = datetime.datetime.fromtimestamp(t1).strftime("%Y-%m-%d")
+  t0_str = datetime.datetime.fromtimestamp(t0, datetime.timezone.utc).strftime("%Y-%m-%d")
+  t1_str = datetime.datetime.fromtimestamp(t1, datetime.timezone.utc).strftime("%Y-%m-%d")
 
   date_value = t0_str
 
@@ -198,7 +224,7 @@ for i_itv in range(0,len(intervals)):
   prevEnd = ts_start_day if i_itv==0 else intervals[i_itv-1][2]
   for config in configs:
     TimeStamp_conf = config[1]
-    dt_conf = datetime.datetime.fromtimestamp(TimeStamp_conf)
+    dt_conf = datetime.datetime.fromtimestamp(TimeStamp_conf, datetime.timezone.utc)
     if prevEnd < TimeStamp_conf and TimeStamp_conf < t0:
       configFile = config[0]
 
