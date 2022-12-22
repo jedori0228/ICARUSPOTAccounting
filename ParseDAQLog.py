@@ -39,12 +39,20 @@ if len(RunningStateCheckOutput)>0:
     startDT_fnal = startDT_utc.astimezone(pytz.timezone('America/Chicago'))
     endDT_fnal = endDT_utc.astimezone(pytz.timezone('America/Chicago'))
 
-    print("@@ Run %d was in RUNNING state (%s ~ %s)"%(runNum, startDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z"), endDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z")))
+    ## If this run is behind args.Start, replace args.Start to this run
+    ## If not, e.g., we don't have to
+    start_day = args.Start
+    ts_start_day = make_timestamp( start_day+" 00:00:00 CDT", "%Y-%m-%d %H:%M:%S %Z" )
 
-    startDate_fnal = startDT_fnal.date().isoformat()
-    print("@@ -> Setting Start date to %s"%(startDate_fnal))
-    args.Start = startDate_fnal
-    break
+    if startDT_utc.timestamp() < ts_start_day:
+
+      print("@@ Run %d was in RUNNING state (%s ~ %s)"%(runNum, startDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z"), endDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z")))
+      startDate_fnal = startDT_fnal.date().isoformat()
+      print("@@ -> Setting Start date to %s"%(startDate_fnal))
+      args.Start = startDate_fnal
+      break
+    else:
+      break
 
 ## Clear and write it again from scatch
 ClearTable = False
