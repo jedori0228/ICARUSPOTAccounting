@@ -27,7 +27,7 @@ def makePOTPlot( df, beam, range ):
     ax0.yaxis.grid( linestyle='-' )
     
     del_label="pot_%s_delivered" % beam
-    
+
     x = pd.to_datetime( df["day"], utc=True )
     y = df[del_label]/1000000
     ax0.bar(x, y, align="center", width=1.0, label="Delivered", alpha=0.4)
@@ -43,6 +43,8 @@ def makePOTPlot( df, beam, range ):
 
     ax0.tick_params(axis="x",direction="in", bottom="on")
 
+    if len(x)<=10:
+      ax0.xaxis.set_major_locator(mdates.DayLocator(interval=1))
     ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
 
     time_margin = pd.to_timedelta('0.5 days')
@@ -60,6 +62,8 @@ def makePOTPlot( df, beam, range ):
     ax1.plot(x, df[ratio_label], 'o', color='black', markersize=10, markerfacecolor='gray', markeredgecolor='black', markeredgewidth=2)
 
     ax1.tick_params(axis="x",direction="in", bottom="on",top='on')
+    if len(x)<=10:
+      ax1.xaxis.set_major_locator(mdates.DayLocator(interval=1))
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
     ax1.set_xlim( pd.to_datetime( range[0], utc=True ) - time_margin, pd.to_datetime( range[1], utc=True ) + time_margin )
 
@@ -111,6 +115,8 @@ def makePOTPlotBoth( df, beam1, beam2,range ):
 
     ax0.tick_params(axis="x",direction="in", bottom="on")
 
+    if len(x)<=10:
+      ax0.xaxis.set_major_locator(mdates.DayLocator(interval=1))
     ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
 
     ax0.legend(fontsize=18, loc='upper left')
@@ -149,11 +155,9 @@ def makePOTSumPlot( df, beam, range ):
     ax0.set_xlabel( "Day (UTC)", fontsize=16 )
     
     ax0.tick_params(axis="x",direction="in", bottom="on")
-
+    if len(x)<=10:
+      ax0.xaxis.set_major_locator(mdates.DayLocator(interval=1))
     ax0.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
-    #ax0.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-    #plt.xticks(rotation=90)#, fontweight='light',  fontsize='x-small',)
-    #ax0.legend(fontsize=18, loc='upper left')
 
     ax0.set_xlim( pd.to_datetime( range[0], utc=True ), pd.to_datetime( range[1], utc=True ) )
 
@@ -210,9 +214,6 @@ def makeIntesityAndPOTSumPlot( df, beam, range ):
     ax1.tick_params(axis="x",direction="in", bottom="on")
 
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %Y, %a'))
-    #ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-    #plt.xticks(rotation=90)#, fontweight='light',  fontsize='x-small',)
-    #ax.legend(fontsize=18, loc='upper left')
 
     ax1.set_xlim( pd.to_datetime( range[0], utc=True ), pd.to_datetime( range[1], utc=True ) )
 
