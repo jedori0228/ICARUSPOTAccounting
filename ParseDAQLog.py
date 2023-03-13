@@ -28,7 +28,7 @@ cur.execute(RunningStateCheckSQL)
 RunningStateCheckOutput = cur.fetchall()
 if len(RunningStateCheckOutput)>0:
   for line in RunningStateCheckOutput:
-    # (9294, 1671406288, 1671602399, 'Physics_General_thr400_Majority_5_7_nb_OverlappingWindow_00001', 'RUNNING')
+    #ex) (9294, 1671406288, 1671602399, 'Physics_General_thr400_Majority_5_7_nb_OverlappingWindow_00001', 'RUNNING')
     runNum = line[0]
     startTS = line[1]
     endTS = line[2]
@@ -61,7 +61,7 @@ if ClearTable:
   cur.execute("DELETE FROM run_timestamp;")
   conn.commit()
 
-## Override values
+## Override the values?
 override = True
 
 ## Range
@@ -89,6 +89,10 @@ for i_line in range(StartLine, len(lines)):
 
   line = lines[i_line].strip('\n')
 
+  if len(line.split())>0:
+    if line.split()[0] not in ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]:
+      continue
+
   if "START transition complete for run" in line:
     run, timestamp = parse_line(line)
     #print("[DEBUG][insert_multi_daily_runs] Start found")
@@ -104,7 +108,7 @@ for i_line in range(StartLine, len(lines)):
       overedge = ["Start", run, timestamp]
       break
 
-  elif ("STOP transition underway for run" in line):
+  elif "STOP transition underway for run" in line:
     run, timestamp = parse_line(line)
     #print("[DEBUG][insert_multi_daily_runs] Stop found")
     if timestamp > ts_start_day and timestamp < ts_end_day: 
@@ -118,7 +122,7 @@ for i_line in range(StartLine, len(lines)):
       overedge = ["Stop", run, timestamp]
       break
 
-  elif ("RECOVER transition underway" in line):
+  elif ("RECOVER transition underway" in line) or  ('DAQInterface in partition 1 launched and now in "stopped" state' in line):
     dummy, timestamp = parse_line(line)
     if timestamp > ts_start_day and timestamp < ts_end_day: 
        recovers.append(["Recover", timestamp])
@@ -167,7 +171,8 @@ if len(edges) > 0:
         ThisComment = "No run between %s ~ %s"%(dt.strftime("%Y-%m-%d %H:%M:%S"), dt_next.strftime("%Y-%m-%d %H:%M:%S"))
         #print(ThisComment)
 
-    elif int(RunNum)+1==int(RunNum_next):
+    #elif int(RunNum)+1==int(RunNum_next):
+    elif int(RunNum)<int(RunNum_next):
 
       if Status=="Start" and Status_next=="Start":
         ThisComment = "Run crashed without clear stop between %s ~ %s"%(dt.strftime("%Y-%m-%d %H:%M:%S"), dt_next.strftime("%Y-%m-%d %H:%M:%S"))
