@@ -44,7 +44,7 @@ DAQIntercae log file (e.g., `DAQInterface_partition1.log`) contains typically O(
 ## Creat temp directory if doesn't exist
 mkdir -p ${potDir}/temp/
 ## Copy file from icarus gateway
-scp ${gatewayhostname}:/daq/log/DAQInterface_partition1.log ${potDir}/temp/  
+source getDAQLog.sh
 ## Run parsing script
 python ParseDAQLog.py -i YYYY-MM-DD -f YYYY-MM-DD
 ```
