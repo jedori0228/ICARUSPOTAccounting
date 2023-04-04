@@ -79,8 +79,11 @@ def get_full_day_horncurrent(ts_start, ts_end, device_name, event, debug=False )
   for i, line in enumerate(f):
     if i==0:
       continue
-    totalcount += 1.
-    sumcurrent += parse_line(line)
+    this_current = parse_line(line)
+    #print("get_full_day_horncurrent", device_name, this_current)
+    if abs(this_current)>10.:
+      totalcount += 1.
+      sumcurrent += this_current
   avgcurrent = 0.
   if totalcount>0.:
     avgcurrent = sumcurrent/totalcount
