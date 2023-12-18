@@ -8,4 +8,4 @@ mkdir -p fig
 export PYTHONPATH=${PYTHONPATH}:${potDir}
 export LD_LIBRARY_PATH=${potDir}/instantclient_21_8/:$LD_LIBRARY_PATH
 
-source /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/shared_env_setup.sh
+source /exp/icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/shared_env_setup.sh
