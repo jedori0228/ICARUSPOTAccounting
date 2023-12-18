@@ -3,14 +3,14 @@
 ## Prerequisite
 [Conda](https://docs.conda.io/en/latest/miniconda.html) is recommended
 ```
-# Recommend /icarus/app/users/ for the miniconda installation
-cd /icarus/app/users/${USER}/
+# Recommend /exp/icarus/app/users/ for the miniconda installation
+cd /exp/icarus/app/users/${USER}/
 # Download the installer
 wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
 # Run the installer
 bash Miniconda3-latest-Linux-x86_64.sh 
 # It asks you where to install the package. Default is ${HOME}, but
-# should be changed to /icarus/app/users/${USER}/miniconda3/
+# should be changed to /exp/icarus/app/users/${USER}/miniconda3/
 # Creating environment from a .yml file (only need once)
 conda env create --name runco --file=CondaEnv/runco.yml
 # Activating the environment (every time with new shell)
@@ -35,7 +35,7 @@ source env_setup.sh
 mkdir -p dbase
 python CreateDB.py
 # 2) Copy from existing one
-cp /icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/RunSummary.db ${potDir}/dbase/
+cp /exp/icarus/app/users/jskim/Runco/ICARUSPOTAccounting/share/RunSummary.db ${potDir}/dbase/
 ```
 
 ## Parsing DAQInterface log file
