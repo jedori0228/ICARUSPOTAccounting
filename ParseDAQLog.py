@@ -17,14 +17,18 @@ parser.add_argument('-i', dest="Start")
 parser.add_argument('-f', dest="End")
 args = parser.parse_args()
 
+print("[ParseDAQLog.py] Request range")
+print("[ParseDAQLog.py] - Start:", args.Start)
+print("[ParseDAQLog.py] - End:", args.End )
+
 potDir = os.environ["potDir"]
 dbname = "%s/dbase/RunSummary.db"%(potDir)
 conn = create_connection(dbname)
 
 ## Check if there's any "RUNNING" state
-RunningStateCheckSQL = 'select * from run_timestamp WHERE comment="RUNNING";'
+sql_RunningStateCheck = 'select * from run_timestamp WHERE comment="RUNNING";'
 cur = conn.cursor()
-cur.execute(RunningStateCheckSQL)
+cur.execute(sql_RunningStateCheck)
 RunningStateCheckOutput = cur.fetchall()
 if len(RunningStateCheckOutput)>0:
   for line in RunningStateCheckOutput:
@@ -46,13 +50,26 @@ if len(RunningStateCheckOutput)>0:
 
     if startDT_utc.timestamp() < ts_start_day:
 
-      print("@@ Run %d was in RUNNING state (%s ~ %s)"%(runNum, startDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z"), endDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z")))
+      print("[ParseDAQLog.py] Run %d was in RUNNING state (%s ~ %s),"%(runNum, startDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z"), endDT_fnal.strftime("%Y-%m-%d %H:%M:%S %Z")))
+      print("[ParseDAQLog.py] so we need to check how this run ended.")
       startDate_fnal = startDT_fnal.date().isoformat()
-      print("@@ -> Setting Start date to %s"%(startDate_fnal))
+      print("[ParseDAQLog.py] -> Setting Start date to %s"%(startDate_fnal))
       args.Start = startDate_fnal
       break
     else:
       break
+# 
+sql_DBLastRunStart = '''SELECT run, start
+FROM run_timestamp
+WHERE run = (SELECT MAX(run) FROM run_timestamp);'''
+cur.execute(sql_DBLastRunStart)
+DBLastRunStartOutput = cur.fetchall()
+DBLastRunStartTimpstamp = DBLastRunStartOutput[0][1]
+DBLastRunStartDatetime = datetime.datetime.fromtimestamp( DBLastRunStartTimpstamp, datetime.timezone.utc )
+
+print("[ParseDAQLog.py] Last run from the current databse")
+print("[ParseDAQLog.py] - Run:", DBLastRunStartOutput[0][0])
+print("[ParseDAQLog.py] - Start:", DBLastRunStartDatetime.strftime("%Y-%m-%d %H:%M:%S %Z"))
 
 ## Clear and write it again from scatch
 ClearTable = False
@@ -81,13 +98,45 @@ configs = []
 underedge = ["NULL",-1,-1]
 overedge = ["NULL",-1,-1]
 
-lines = open("%s/temp/DAQInterface_partition1.log"%(potDir)).readlines()
+daglogfilepath = "%s/temp/DAQInterface_partition1.log"%(potDir)
+daqlog_lines = open(daglogfilepath).readlines()
 
 out = open("%s/temp/ParsedDAQInterface.txt"%(potDir),"w")
 
-for i_line in range(StartLine, len(lines)):
+# Quickly check the last timestamp 
+for j_line in range(StartLine, len(daqlog_lines)):
 
-  line = lines[i_line].strip('\n')
+  i_line = len(daqlog_lines) - 1 - j_line
+
+  line = daqlog_lines[i_line].strip('\n')
+  if len(line.split())>0:
+    if line.split()[0] not in ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]:
+      continue
+
+  IsParsibleLine = False
+  for known_line in ["START transition complete for run", "STOP transition underway for run", "RECOVER transition underway", 'DAQInterface in partition 1 launched and now in "stopped" state', "CONFIG transition underway"]:
+    if known_line in line:
+      IsParsibleLine = True
+      break;
+  if not IsParsibleLine:
+    continue
+
+  LogLastRun, LogLastTimestamp = parse_line(line)
+  LogLastDatetime = datetime.datetime.fromtimestamp( LogLastTimestamp, datetime.timezone.utc )
+
+  print("[ParseDAQLog.py] DAQ log file to be parsed %s"%(daglogfilepath))
+  print("[ParseDAQLog.py] - Current log file has last timestamp at:", LogLastDatetime.strftime("%Y-%m-%d %H:%M:%S %Z") )
+
+  if ts_start_day>LogLastTimestamp:
+    print("[ParseDAQLog.py] * Requested start time was", start_day, "but the current log file might not be the latest. You might want to copy the latest logfile.")
+  break
+
+raise
+
+
+for i_line in range(StartLine, len(daqlog_lines)):
+
+  line = daqlog_lines[i_line].strip('\n')
 
   if len(line.split())>0:
     if line.split()[0] not in ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]:
@@ -131,7 +180,7 @@ for i_line in range(StartLine, len(lines)):
 
   elif ("CONFIG transition underway" in line):
     dummy, timestamp = parse_line(line)
-    nextline = lines[i_line+1].strip('\n')
+    nextline = daqlog_lines[i_line+1].strip('\n')
     configFile = "NULL"
     if "Config name: " in nextline:
       configFile = nextline.replace('Config name: ','')
