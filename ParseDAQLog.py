@@ -58,7 +58,8 @@ if len(RunningStateCheckOutput)>0:
       break
     else:
       break
-# 
+
+## Check the last run from current database
 sql_DBLastRunStart = '''SELECT run, start
 FROM run_timestamp
 WHERE run = (SELECT MAX(run) FROM run_timestamp);'''
@@ -103,7 +104,7 @@ daqlog_lines = open(daglogfilepath).readlines()
 
 out = open("%s/temp/ParsedDAQInterface.txt"%(potDir),"w")
 
-# Quickly check the last timestamp 
+## Quickly check the last timestamp 
 for j_line in range(StartLine, len(daqlog_lines)):
 
   i_line = len(daqlog_lines) - 1 - j_line
@@ -131,9 +132,7 @@ for j_line in range(StartLine, len(daqlog_lines)):
     print("[ParseDAQLog.py] * Requested start time was", start_day, "but the current log file might not be the latest. You might want to copy the latest logfile.")
   break
 
-raise
-
-
+## Now loop over logfiles and collect edges
 for i_line in range(StartLine, len(daqlog_lines)):
 
   line = daqlog_lines[i_line].strip('\n')
